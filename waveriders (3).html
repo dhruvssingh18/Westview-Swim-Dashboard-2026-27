@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Westview Swim Team</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#1B4FD8;--blue-dark:#0F2E8A;--blue-light:#EBF1FD;--blue-mid:#D1E0FA;
+  --red:#C8202A;--red-light:#FCEDEF;--red-dark:#8C141C;
+  --bg:#F2F5FA;--surface:#fff;--border:#DDE3EF;--border-strong:#B8C4DC;
+  --text:#1A2340;--text-2:#4A5675;--text-3:#8492AA;
+  --green:#166534;--green-bg:#DCFCE7;--amber:#92400E;--amber-bg:#FEF3C7;
+  --purple:#6D28D9;--purple-bg:#EDE9FE;
+  --sidebar-w:230px;--font:'Manrope',sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px;line-height:1.5;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--blue-dark);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+.sidebar-brand{display:flex;align-items:center;gap:12px;padding:20px 18px 18px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.brand-mark{min-width:38px;height:38px;background:var(--red);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;letter-spacing:-0.5px;}
+.brand-name{font-weight:800;font-size:14.5px;color:#fff;line-height:1.15;}
+.brand-sub{font-size:10px;color:rgba(255,255,255,0.38);text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-top:1px;}
+.sidebar-nav{flex:1;padding:12px 10px;display:flex;flex-direction:column;gap:1px;overflow-y:auto;}
+.nav-section{font-size:9.5px;font-weight:700;color:rgba(255,255,255,0.28);text-transform:uppercase;letter-spacing:1.1px;padding:10px 10px 5px;margin-top:4px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:8px;color:rgba(255,255,255,0.56);font-size:12.5px;font-weight:600;cursor:pointer;transition:background .13s,color .13s;border:none;background:none;width:100%;text-align:left;}
+.nav-item i{font-size:15px;flex-shrink:0;}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.9);}
+.nav-item.active{background:rgba(255,255,255,0.13);color:#fff;}
+.nav-notif{margin-left:auto;background:var(--red);color:#fff;border-radius:10px;font-size:10px;font-weight:700;padding:1px 6px;min-width:18px;text-align:center;}
+.sidebar-footer{padding:10px 10px 14px;border-top:1px solid rgba(255,255,255,0.07);}
+.coach-link{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:8px;color:rgba(255,255,255,0.48);font-size:12.5px;font-weight:600;background:rgba(200,32,42,0.14);cursor:pointer;transition:background .13s,color .13s;border:none;width:100%;text-align:left;}
+.coach-link i{font-size:15px;}
+.coach-link:hover{background:rgba(200,32,42,0.28);color:#fff;}
+.coach-link.active,.coach-link.logged-in{background:rgba(200,32,42,0.28);color:#fff;}
+.coach-badge{margin-left:auto;background:rgba(255,255,255,0.16);border-radius:4px;font-size:9.5px;padding:2px 6px;font-weight:700;}
+
+/* MAIN */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+
+/* ANNOUNCE BAR */
+.announce-bar{background:var(--blue);color:#fff;padding:8px 28px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .15s;}
+.announce-bar:hover{background:var(--blue-dark);}
+.announce-bar i{font-size:14px;flex-shrink:0;}
+.announce-bar-text{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.announce-bar.hidden{display:none;}
+
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.page-title{font-weight:800;font-size:17px;letter-spacing:-0.3px;}
+.page-sub{font-size:12px;color:var(--text-3);margin-top:1px;font-weight:500;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.date-badge{font-size:12px;color:var(--text-2);background:var(--bg);border:1px solid var(--border);padding:5px 12px;border-radius:6px;font-weight:600;}
+.content{padding:24px;display:flex;flex-direction:column;gap:18px;}
+.page{display:none;}.page.active{display:flex;flex-direction:column;gap:18px;}
+
+/* STATS */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;}
+.stat-label{font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;font-weight:700;}
+.stat-num{font-weight:800;font-size:30px;color:var(--blue);line-height:1;margin-bottom:7px;letter-spacing:-1px;}
+.stat-num.red{color:var(--red);}.stat-num.green{color:var(--green);}
+.stat-change{font-size:12px;color:var(--text-3);display:flex;align-items:center;gap:4px;font-weight:500;}
+.stat-change.up{color:var(--green);}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);}
+.card-title{font-size:13.5px;font-weight:700;letter-spacing:-0.1px;}
+.card-link{font-size:12px;color:var(--blue);display:flex;align-items:center;gap:4px;cursor:pointer;background:none;border:none;font-family:var(--font);font-weight:600;}
+.card-link:hover{text-decoration:underline;}
+.card-body{padding:20px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+
+/* EVENT LIST */
+.event-list{display:flex;flex-direction:column;}
+.event-row{display:flex;align-items:center;gap:14px;padding:11px 20px;border-bottom:1px solid var(--border);}
+.event-row:last-child{border-bottom:none;}
+.event-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.event-dot.meet{background:var(--blue);}.event-dot.practice{background:var(--green);}.event-dot.trial{background:#92400E;}
+.event-info{flex:1;}.event-name{font-size:13px;font-weight:600;}.event-meta{font-size:11.5px;color:var(--text-3);margin-top:2px;}
+
+/* BADGES */
+.badge{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:0.4px;white-space:nowrap;}
+.badge-blue{background:var(--blue-light);color:var(--blue-dark);}
+.badge-green{background:var(--green-bg);color:var(--green);}
+.badge-amber{background:var(--amber-bg);color:var(--amber);}
+.badge-red{background:var(--red-light);color:var(--red-dark);}
+.badge-grey{background:#F0F2F5;color:#555;}
+.badge-purple{background:var(--purple-bg);color:var(--purple);}
+
+/* GENDER TABS */
+.gender-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);}
+.gender-tab{padding:10px 20px;font-size:13px;font-weight:700;color:var(--text-3);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .13s,border-color .13s;display:flex;align-items:center;gap:7px;}
+.gender-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+.gender-tab i{font-size:15px;}
+
+/* TABLES */
+.dash-table{width:100%;border-collapse:collapse;}
+.dash-table th{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;padding:10px 18px;text-align:left;border-bottom:1px solid var(--border);background:var(--bg);}
+.dash-table td{padding:11px 18px;font-size:13px;border-bottom:1px solid var(--border);}
+.dash-table tr:last-child td{border-bottom:none;}
+.dash-table tbody tr:hover td{background:#FAFBFF;}
+.time-val{font-family:'DM Mono',monospace;font-weight:500;color:var(--blue);font-size:12.5px;}
+.pb{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;}
+
+/* NOTICE */
+.notice-bar{display:flex;align-items:flex-start;gap:14px;padding:16px 20px;background:var(--blue-light);border-left:3px solid var(--blue);}
+.notice-icon{font-size:18px;color:var(--blue);flex-shrink:0;margin-top:2px;}
+.notice-text{font-size:13px;color:var(--blue-dark);line-height:1.65;font-weight:500;}
+.notice-from{font-size:11.5px;color:var(--text-3);margin-top:5px;}
+
+/* FORMS */
+.form-section{padding:18px 20px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.form-grid.full{grid-template-columns:1fr;}.form-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.form-field label{display:block;font-size:10.5px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;}
+.form-field input,.form-field select,.form-field textarea{width:100%;padding:8px 12px;border:1px solid var(--border-strong);border-radius:7px;font-family:var(--font);font-size:13px;color:var(--text);background:var(--bg);outline:none;transition:border .15s;font-weight:500;}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--blue);background:#fff;}
+.form-field textarea{resize:vertical;min-height:72px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:7px;border:none;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:background .13s;}
+.btn-primary{background:var(--blue);color:#fff;}.btn-primary:hover{background:var(--blue-dark);}
+.btn-red{background:var(--red);color:#fff;}.btn-red:hover{background:var(--red-dark);}
+.btn-ghost{background:var(--surface);color:var(--text-2);border:1px solid var(--border-strong);}.btn-ghost:hover{background:var(--bg);}
+.btn i{font-size:14px;}.btn-sm{padding:6px 12px;font-size:12px;}
+
+/* AVATAR */
+.avatar{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}
+.swimmer-cell{display:flex;align-items:center;gap:9px;}
+
+/* CALENDAR */
+.cal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);}
+.cal-nav{display:flex;align-items:center;gap:12px;}
+.cal-month{font-weight:800;font-size:15px;letter-spacing:-0.3px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+.cal-day-label{text-align:center;font-size:10.5px;font-weight:700;color:var(--text-3);padding:10px 0;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);}
+.cal-cell{min-height:88px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:6px;position:relative;}
+.cal-cell:nth-child(7n){border-right:none;}
+.cal-cell.other-month .cal-date{color:var(--text-3);}
+.cal-cell.today{background:#FAFBFF;}
+.cal-cell.today .cal-date{background:var(--blue);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.cal-date{font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.cal-event-chip{font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:4px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:opacity .13s;}
+.cal-event-chip:hover{opacity:.8;}
+.cal-event-chip.practice{background:#DCFCE7;color:#166534;}
+.cal-event-chip.meet{background:var(--blue-light);color:var(--blue-dark);}
+.cal-event-chip.trial{background:var(--amber-bg);color:var(--amber);}
+.cal-event-chip.lapathon{background:var(--red-light);color:var(--red-dark);}
+.cal-event-chip.social{background:var(--purple-bg);color:var(--purple);}
+.cal-event-chip.other{background:#F0F2F5;color:#555;}
+
+/* ANALYTICS */
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.chart-body{padding:20px;position:relative;}
+.chart-wrap{position:relative;height:240px;}
+
+/* CHAT */
+.chat-layout{display:grid;grid-template-columns:1fr 260px;gap:18px;align-items:start;}
+.chat-window{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.chat-messages{height:400px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg);}
+.chat-msg{max-width:74%;}.chat-msg.bot{align-self:flex-start;}.chat-msg.user{align-self:flex-end;}
+.chat-label{font-size:10px;font-weight:700;margin-bottom:4px;color:var(--text-3);letter-spacing:.2px;}
+.chat-msg.user .chat-label{text-align:right;}
+.chat-bubble{padding:10px 14px;border-radius:10px;font-size:13px;line-height:1.58;font-weight:500;}
+.chat-msg.bot .chat-bubble{background:#fff;border:1px solid var(--border);color:var(--text);border-bottom-left-radius:3px;}
+.chat-msg.user .chat-bubble{background:var(--blue);color:#fff;border-bottom-right-radius:3px;}
+.chat-input-area{padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px;background:#fff;}
+.chat-input-area input{flex:1;padding:8px 12px;border:1px solid var(--border-strong);border-radius:7px;font-family:var(--font);font-size:13px;color:var(--text);background:var(--bg);outline:none;}
+.chat-input-area input:focus{border-color:var(--blue);background:#fff;}
+.quick-btn{display:block;width:100%;text-align:left;padding:8px 12px;margin-bottom:6px;border-radius:7px;border:1px solid var(--border);background:#fff;font-family:var(--font);font-size:12px;color:var(--text-2);cursor:pointer;font-weight:600;}
+.quick-btn:last-child{margin-bottom:0;}
+.quick-btn:hover{background:var(--blue-light);border-color:var(--blue-mid);color:var(--blue-dark);}
+.typing-dots span{display:inline-block;width:5px;height:5px;background:var(--text-3);border-radius:50%;margin:0 2px;animation:blink 1s infinite;}
+.typing-dots span:nth-child(2){animation-delay:.18s;}.typing-dots span:nth-child(3){animation-delay:.36s;}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+
+/* COACH BANNER */
+.coach-banner{background:var(--red);padding:20px 24px;border-radius:10px;}
+.coach-banner-title{font-weight:800;font-size:17px;color:#fff;}
+.coach-banner-sub{font-size:12.5px;color:rgba(255,255,255,0.75);margin-top:3px;font-weight:500;}
+.t-stats{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.t-stat{background:rgba(255,255,255,0.15);border-radius:8px;padding:10px 16px;}
+.t-stat-num{font-weight:800;font-size:22px;color:#fff;letter-spacing:-1px;}
+.t-stat-label{font-size:10px;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:.5px;font-weight:700;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,22,46,.55);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:#fff;border-radius:14px;padding:30px;width:380px;max-width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.18);transform:translateY(12px);transition:transform .2s;}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-title{font-weight:800;font-size:16px;letter-spacing:-0.3px;margin-bottom:3px;}
+.modal-sub{font-size:12.5px;color:var(--text-3);margin-bottom:20px;font-weight:500;}
+.modal .form-field{margin-bottom:12px;}
+.modal-err{font-size:12px;color:var(--red);font-weight:600;margin-bottom:10px;display:none;}
+.modal-footer{display:flex;gap:8px;margin-top:18px;}
+
+/* PDF UPLOAD */
+.upload-zone{border:2px dashed var(--border-strong);border-radius:10px;padding:26px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;background:var(--bg);}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--blue);background:var(--blue-light);}
+.upload-zone i{font-size:26px;color:var(--text-3);display:block;margin-bottom:8px;}
+.upload-zone-title{font-weight:700;font-size:13.5px;color:var(--text-2);margin-bottom:3px;}
+.upload-zone-sub{font-size:12px;color:var(--text-3);}
+.upload-progress{margin-top:14px;display:none;}
+.prog{background:var(--border);border-radius:4px;height:6px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:4px;}
+.upload-status{font-size:12.5px;font-weight:600;color:var(--blue);margin-top:7px;}
+
+/* PROGRESS */
+.progress-bar{background:var(--border);border-radius:4px;height:6px;overflow:hidden;width:80px;}
+.progress-fill{height:100%;border-radius:4px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:#1a2340;color:#fff;padding:11px 17px;border-radius:8px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;transform:translateY(80px);opacity:0;transition:transform .25s,opacity .25s;z-index:999;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast i{font-size:15px;}
+
+.filter-select{font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text-2);outline:none;cursor:pointer;font-family:var(--font);font-weight:600;}
+.empty-state{padding:40px 20px;text-align:center;color:var(--text-3);}
+.empty-state i{font-size:30px;display:block;margin-bottom:10px;}
+.empty-state p{font-size:13px;font-weight:500;}
+.divider-label{font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;padding:12px 20px 8px;background:var(--bg);border-bottom:1px solid var(--border);}
+
+/* ADD EVENT CAL MODAL */
+.cal-add-modal .modal{width:440px;}
+
+@media(max-width:900px){.stat-row{grid-template-columns:1fr 1fr;}.two-col,.three-col{grid-template-columns:1fr;}.chat-layout{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="login-modal">
+  <div class="modal">
+    <div style="width:38px;height:38px;background:var(--red);border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;"><i class="ti ti-shield-lock" style="color:#fff;font-size:18px;"></i></div>
+    <div class="modal-title">Coach Access</div>
+    <div class="modal-sub">Sign in with your coaching credentials.</div>
+    <div class="modal-err" id="login-err">Incorrect username or password.</div>
+    <div class="form-field"><label>Username</label><input id="login-user" type="text" placeholder="Username" autocomplete="username"></div>
+    <div class="form-field"><label>Password</label><input id="login-pass" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="doLogin()"><i class="ti ti-login"></i> Sign in</button>
+      <button class="btn btn-ghost" onclick="closeModal('login-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD CAL EVENT MODAL -->
+<div class="modal-overlay cal-add-modal" id="cal-modal">
+  <div class="modal" style="width:440px;">
+    <div class="modal-title">Add Calendar Event</div>
+    <div class="modal-sub">Schedule a practice, meet, or team event.</div>
+    <div class="form-grid">
+      <div class="form-field"><label>Event name</label><input id="cal-name" placeholder="e.g. Morning Practice"></div>
+      <div class="form-field"><label>Type</label>
+        <select id="cal-type">
+          <option value="practice">Practice</option>
+          <option value="meet">Meet</option>
+          <option value="trial">Time Trial</option>
+          <option value="lapathon">Lap-a-thon</option>
+          <option value="social">Team Social</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-field"><label>Date</label><input id="cal-date" type="date"></div>
+      <div class="form-field"><label>Time</label><input id="cal-time" type="time"></div>
+    </div>
+    <div class="form-grid full"><div class="form-field"><label>Location (optional)</label><input id="cal-location" placeholder="Pool or venue"></div></div>
+    <div class="form-grid full"><div class="form-field"><label>Note (optional)</label><input id="cal-note" placeholder="Short note shown on calendar"></div></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="addCalEvent()"><i class="ti ti-check"></i> Add event</button>
+      <button class="btn btn-ghost" onclick="closeModal('cal-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark">WHS</div>
+    <div><div class="brand-name">Westview</div><div class="brand-sub">Swim Team</div></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Main</div>
+    <button class="nav-item active" onclick="goTo('home',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+    <button class="nav-item" onclick="goTo('announcements',this)"><i class="ti ti-speakerphone"></i> Announcements<span class="nav-notif" id="ann-notif">0</span></button>
+    <button class="nav-item" onclick="goTo('events',this)"><i class="ti ti-calendar-event"></i> Events</button>
+    <button class="nav-item" onclick="goTo('times',this)"><i class="ti ti-clock"></i> Times</button>
+    <div class="nav-section">Team</div>
+    <button class="nav-item" onclick="goTo('team',this)"><i class="ti ti-users"></i> Roster</button>
+    <button class="nav-item" onclick="goTo('analytics',this)"><i class="ti ti-chart-bar"></i> Analytics</button>
+    <div class="nav-section">Training</div>
+    <button class="nav-item" onclick="goTo('calendar',this)"><i class="ti ti-calendar-month"></i> Practice Calendar</button>
+    <button class="nav-item" onclick="goTo('coach',this)"><i class="ti ti-robot"></i> AI Coach</button>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="coach-link" id="coach-nav" onclick="coachNavClick()"><i class="ti ti-shield"></i><span id="coach-nav-label">Coach Login</span><span class="coach-badge" id="coach-badge" style="display:none">COACH</span></button>
+  </div>
+</aside>
+
+<main class="main">
+  <!-- ANNOUNCEMENT BAR -->
+  <div class="announce-bar" id="announce-bar" onclick="goTo('announcements',document.querySelector('[onclick*=announcements]'))">
+    <i class="ti ti-speakerphone"></i>
+    <span class="announce-bar-text" id="announce-bar-text">Welcome to Westview Swim Team — check Announcements for updates.</span>
+    <span style="font-size:11px;opacity:.75;white-space:nowrap;">View all →</span>
+  </div>
+
+  <header class="topbar">
+    <div><div class="page-title" id="topbar-title">Dashboard</div><div class="page-sub" id="topbar-sub">Welcome back — here's your team overview.</div></div>
+    <div class="topbar-right" id="topbar-action"><span class="date-badge" id="today-date"></span></div>
+  </header>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="stat-row">
+        <div class="stat-card"><div class="stat-label">Team members</div><div class="stat-num" id="s-members">—</div><div class="stat-change up"><i class="ti ti-arrow-up"></i> Active roster</div></div>
+        <div class="stat-card"><div class="stat-label">Upcoming events</div><div class="stat-num" id="s-events">—</div><div class="stat-change">This season</div></div>
+        <div class="stat-card"><div class="stat-label">Times logged</div><div class="stat-num" id="s-times">—</div><div class="stat-change up"><i class="ti ti-arrow-up"></i> All time</div></div>
+        <div class="stat-card"><div class="stat-label">Personal bests</div><div class="stat-num red" id="s-pbs">—</div><div class="stat-change up"><i class="ti ti-arrow-up"></i> Season</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Upcoming events</span><button class="card-link" onclick="navClick('events')">View all <i class="ti ti-arrow-right"></i></button></div>
+          <div class="event-list" id="home-events"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Recent personal bests</span><button class="card-link" onclick="navClick('times')">All times <i class="ti ti-arrow-right"></i></button></div>
+          <table class="dash-table"><thead><tr><th>Swimmer</th><th>Event</th><th>Time</th><th></th></tr></thead><tbody id="home-times"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANNOUNCEMENTS -->
+    <div class="page" id="page-announcements">
+      <div id="ann-list"></div>
+    </div>
+
+    <!-- EVENTS -->
+    <div class="page" id="page-events">
+      <div class="card" id="event-form-card" style="display:none;">
+        <div class="card-header"><span class="card-title">New event</span><button class="btn btn-ghost btn-sm" onclick="document.getElementById('event-form-card').style.display='none'"><i class="ti ti-x"></i> Cancel</button></div>
+        <div class="form-section">
+          <div class="form-grid">
+            <div class="form-field"><label>Event name</label><input id="ev-name" placeholder="e.g. vs Jefferson High"></div>
+            <div class="form-field"><label>Type</label><select id="ev-type"><option value="meet">Meet</option><option value="practice">Practice</option><option value="trial">Time Trial</option></select></div>
+            <div class="form-field"><label>Date</label><input id="ev-date" type="date"></div>
+            <div class="form-field"><label>Time</label><input id="ev-time" type="time"></div>
+          </div>
+          <div class="form-grid full" style="margin-bottom:16px;"><div class="form-field"><label>Location</label><input id="ev-location" placeholder="Pool or venue"></div></div>
+          <button class="btn btn-primary" onclick="addEvent()"><i class="ti ti-check"></i> Save event</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">All events</span>
+          <select class="filter-select" id="ev-filter" onchange="renderEvents()"><option value="">All types</option><option value="meet">Meets</option><option value="practice">Practices</option><option value="trial">Time Trials</option></select>
+        </div>
+        <table class="dash-table"><thead><tr><th>Event</th><th>Type</th><th>Date</th><th>Time</th><th>Location</th><th></th></tr></thead><tbody id="events-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- TIMES -->
+    <div class="page" id="page-times">
+      <div class="card" id="times-form-card" style="display:none;">
+        <div class="card-header"><span class="card-title">Log a time</span><button class="btn btn-ghost btn-sm" onclick="document.getElementById('times-form-card').style.display='none'"><i class="ti ti-x"></i> Cancel</button></div>
+        <div class="form-section">
+          <div class="form-grid">
+            <div class="form-field"><label>Swimmer name</label><input id="t-name" placeholder="Full name"></div>
+            <div class="form-field"><label>Gender</label><select id="t-gender"><option value="girls">Girls</option><option value="boys">Boys</option></select></div>
+            <div class="form-field"><label>Stroke</label><select id="t-stroke"><option>Freestyle</option><option>Backstroke</option><option>Breaststroke</option><option>Butterfly</option><option>Individual Medley</option></select></div>
+            <div class="form-field"><label>Distance</label><select id="t-dist"><option>25m</option><option>50m</option><option>100m</option><option>200m</option><option>400m</option><option>500m</option></select></div>
+            <div class="form-field"><label>Time (seconds)</label><input id="t-time" placeholder="e.g. 58.34"></div>
+            <div class="form-field"><label>Date</label><input id="t-date" type="date"></div>
+          </div>
+          <button class="btn btn-primary" onclick="logTime()"><i class="ti ti-check"></i> Save time</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="gender-tabs" id="times-gender-tabs">
+          <button class="gender-tab active" onclick="setTimesGender('girls',this)"><i class="ti ti-gender-female"></i> Girls</button>
+          <button class="gender-tab" onclick="setTimesGender('boys',this)"><i class="ti ti-gender-male"></i> Boys</button>
+        </div>
+        <div style="padding:12px 18px;border-bottom:1px solid var(--border);display:flex;gap:8px;">
+          <select class="filter-select" id="times-filter" onchange="renderTimes()"><option value="">All strokes</option><option>Freestyle</option><option>Backstroke</option><option>Breaststroke</option><option>Butterfly</option><option>Individual Medley</option></select>
+        </div>
+        <table class="dash-table"><thead><tr><th>Swimmer</th><th>Stroke</th><th>Distance</th><th>Time</th><th>Date</th><th></th></tr></thead><tbody id="times-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- TEAM -->
+    <div class="page" id="page-team">
+      <div class="card">
+        <div class="gender-tabs">
+          <button class="gender-tab active" onclick="setTeamGender('girls',this)"><i class="ti ti-gender-female"></i> Girls</button>
+          <button class="gender-tab" onclick="setTeamGender('boys',this)"><i class="ti ti-gender-male"></i> Boys</button>
+        </div>
+        <table class="dash-table"><thead><tr><th>Swimmer</th><th>Grade</th><th>Specialty</th><th>Best time</th><th>Status</th></tr></thead><tbody id="team-tbody"></tbody></table>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Add swimmer</span></div>
+          <div class="form-section">
+            <div class="form-grid">
+              <div class="form-field"><label>Full name</label><input id="sw-name" placeholder="e.g. Jordan Smith"></div>
+              <div class="form-field"><label>Gender</label><select id="sw-gender"><option value="girls">Girls</option><option value="boys">Boys</option></select></div>
+              <div class="form-field"><label>Grade</label><select id="sw-grade"><option>9th</option><option>10th</option><option>11th</option><option>12th</option></select></div>
+              <div class="form-field"><label>Specialty</label><select id="sw-spec"><option>Freestyle</option><option>Backstroke</option><option>Breaststroke</option><option>Butterfly</option><option>IM</option></select></div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="addSwimmer()"><i class="ti ti-user-plus"></i> Add swimmer</button>
+          </div>
+        </div>
+        <div class="card"><div class="card-header"><span class="card-title">Stroke breakdown</span></div><div class="card-body" id="stroke-breakdown"></div></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="page" id="page-analytics">
+      <div class="stat-row" id="an-stats"></div>
+      <div class="two-col">
+        <div class="chart-card"><div class="card-header"><span class="card-title">Times logged over time</span><span class="badge badge-blue">Girls &amp; Boys</span></div><div class="chart-body"><div class="chart-wrap"><canvas id="chart-times"></canvas></div></div></div>
+        <div class="chart-card"><div class="card-header"><span class="card-title">Stroke distribution</span></div><div class="chart-body"><div class="chart-wrap"><canvas id="chart-strokes"></canvas></div></div></div>
+      </div>
+      <div class="two-col">
+        <div class="chart-card"><div class="card-header"><span class="card-title">Girls — top times by event</span><span class="badge badge-red">Girls</span></div><div class="chart-body"><div class="chart-wrap"><canvas id="chart-girls"></canvas></div></div></div>
+        <div class="chart-card"><div class="card-header"><span class="card-title">Boys — top times by event</span><span class="badge badge-blue">Boys</span></div><div class="chart-body"><div class="chart-wrap"><canvas id="chart-boys"></canvas></div></div></div>
+      </div>
+      <div class="chart-card"><div class="card-header"><span class="card-title">Personal bests leaderboard</span></div><div class="card-body" id="pb-leaderboard"></div></div>
+    </div>
+
+    <!-- PRACTICE CALENDAR -->
+    <div class="page" id="page-calendar">
+      <div class="card">
+        <div class="cal-header">
+          <div class="cal-nav">
+            <button class="btn btn-ghost btn-sm" onclick="calMove(-1)"><i class="ti ti-chevron-left"></i></button>
+            <span class="cal-month" id="cal-month-label"></span>
+            <button class="btn btn-ghost btn-sm" onclick="calMove(1)"><i class="ti ti-chevron-right"></i></button>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openCalModal()"><i class="ti ti-plus"></i> Add event</button>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-day-label">Sun</div><div class="cal-day-label">Mon</div><div class="cal-day-label">Tue</div><div class="cal-day-label">Wed</div><div class="cal-day-label">Thu</div><div class="cal-day-label">Fri</div><div class="cal-day-label">Sat</div>
+        </div>
+        <div class="cal-grid" id="cal-body" style="border-top:1px solid var(--border);"></div>
+      </div>
+      <!-- LEGEND -->
+      <div class="card"><div class="card-body" style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+        <span style="font-size:12px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;">Legend</span>
+        <span class="cal-event-chip practice" style="cursor:default;">Practice</span>
+        <span class="cal-event-chip meet" style="cursor:default;">Meet</span>
+        <span class="cal-event-chip trial" style="cursor:default;">Time Trial</span>
+        <span class="cal-event-chip lapathon" style="cursor:default;">Lap-a-thon</span>
+        <span class="cal-event-chip social" style="cursor:default;">Team Social</span>
+        <span class="cal-event-chip other" style="cursor:default;">Other</span>
+      </div></div>
+    </div>
+
+    <!-- AI COACH -->
+    <div class="page" id="page-coach">
+      <div class="chat-layout">
+        <div class="chat-window card">
+          <div class="card-header"><div><div class="card-title">Coach Splash — AI Assistant</div><div style="font-size:11.5px;color:var(--text-3);margin-top:1px;font-weight:500;">Technique, training, race strategy, nutrition.</div></div><span class="badge badge-green">Online</span></div>
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-msg bot"><div class="chat-label">Coach Splash</div><div class="chat-bubble">Hi! I'm Coach Splash, your AI swim coach. Ask me anything — stroke technique, training plans, race strategy, nutrition, turns, breathing. I'm here to help.</div></div>
+          </div>
+          <div class="chat-input-area">
+            <input id="chat-input" placeholder="Ask Coach Splash…" onkeydown="if(event.key==='Enter')sendChat()">
+            <button class="btn btn-primary btn-sm" onclick="sendChat()"><i class="ti ti-send"></i> Send</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="card"><div class="card-header"><span class="card-title">Quick questions</span></div><div class="card-body" style="padding:12px;">
+            <button class="quick-btn" onclick="quickAsk('How do I improve my butterfly stroke technique?')">Butterfly technique tips</button>
+            <button class="quick-btn" onclick="quickAsk('What should I eat the night before a swim meet?')">Pre-meet nutrition</button>
+            <button class="quick-btn" onclick="quickAsk('Create a 5-day weekly training plan for a competitive high school swimmer.')">Weekly training plan</button>
+            <button class="quick-btn" onclick="quickAsk('How can I improve my flip turns and push-offs?')">Flip turns & walls</button>
+            <button class="quick-btn" onclick="quickAsk('How do I mentally prepare for a big swim meet?')">Mental preparation</button>
+          </div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COACH PORTAL -->
+    <div class="page" id="page-teacher">
+      <div class="coach-banner">
+        <div class="coach-banner-title">Coach Portal</div>
+        <div class="coach-banner-sub">Manage the team, post announcements, and import meet results.</div>
+        <div class="t-stats">
+          <div class="t-stat"><div class="t-stat-num" id="ts-swimmers">—</div><div class="t-stat-label">Swimmers</div></div>
+          <div class="t-stat"><div class="t-stat-num" id="ts-events">—</div><div class="t-stat-label">Events</div></div>
+          <div class="t-stat"><div class="t-stat-num" id="ts-times">—</div><div class="t-stat-label">Times</div></div>
+          <div class="t-stat"><div class="t-stat-num" id="ts-pbs">—</div><div class="t-stat-label">PBs</div></div>
+        </div>
+      </div>
+
+      <!-- PDF IMPORT -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Import meet results from PDF</span><span class="badge badge-blue">AI-Powered</span></div>
+        <div class="form-section">
+          <div class="upload-zone" id="upload-zone" onclick="document.getElementById('pdf-input').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+            <input type="file" id="pdf-input" accept=".pdf,image/*" style="display:none" onchange="handlePDFFile(this.files[0])">
+            <i class="ti ti-file-type-pdf"></i>
+            <div class="upload-zone-title">Drop your meet results PDF here</div>
+            <div class="upload-zone-sub">or click to browse — AI will extract all swimmer times and update the site</div>
+          </div>
+          <div class="upload-progress" id="upload-progress">
+            <div class="prog"><div class="prog-fill" id="upload-bar" style="width:0%;background:var(--blue);transition:width .4s;"></div></div>
+            <div class="upload-status" id="upload-status">Reading file…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Post announcement</span></div>
+          <div class="form-section">
+            <div class="form-grid full" style="margin-bottom:12px;"><div class="form-field"><label>Title</label><input id="ann-title" placeholder="e.g. Practice time change"></div></div>
+            <div class="form-grid full" style="margin-bottom:12px;"><div class="form-field"><label>Message</label><textarea id="ann-text" placeholder="Full announcement message…"></textarea></div></div>
+            <div class="form-grid full" style="margin-bottom:16px;"><div class="form-field"><label>Posted by</label><input id="ann-from" value="Coach Williams"></div></div>
+            <button class="btn btn-red" onclick="postAnnouncement()"><i class="ti ti-megaphone"></i> Post announcement</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Swimmer note</span></div>
+          <div class="form-section">
+            <div class="form-grid full" style="margin-bottom:12px;"><div class="form-field"><label>Swimmer</label><select id="note-swimmer" style="width:100%"></select></div></div>
+            <div class="form-grid full" style="margin-bottom:16px;"><div class="form-field"><label>Note</label><textarea id="note-text" placeholder="e.g. Work on flip turns — losing 0.3s per wall."></textarea></div></div>
+            <button class="btn btn-primary" onclick="saveNote()"><i class="ti ti-notes"></i> Save note</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Swimmer progress</span></div>
+        <table class="dash-table"><thead><tr><th>Swimmer</th><th>Gender</th><th>Specialty</th><th>Times</th><th>Best</th><th>Progress</th><th>Note</th></tr></thead><tbody id="teacher-tbody"></tbody></table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"><i class="ti ti-check" id="toast-icon"></i> <span id="toast-msg">Saved.</span></div>
+
+<script>
+// ── AUTH ──────────────────────────────────────────────────
+const COACH_USER='westviewCoach', COACH_PASS='swim26west';
+let coachLoggedIn=sessionStorage.getItem('wr_coach')==='1';
+
+function coachNavClick(){
+  if(coachLoggedIn){goTo('teacher',document.getElementById('coach-nav'));}
+  else{openModal('login-modal');setTimeout(()=>document.getElementById('login-user').focus(),220);}
+}
+function doLogin(){
+  const u=document.getElementById('login-user').value.trim();
+  const p=document.getElementById('login-pass').value;
+  if(u===COACH_USER&&p===COACH_PASS){
+    coachLoggedIn=true;sessionStorage.setItem('wr_coach','1');
+    document.getElementById('login-err').style.display='none';
+    closeModal('login-modal');
+    document.getElementById('coach-nav-label').textContent='Coach Portal';
+    document.getElementById('coach-badge').style.display='';
+    document.getElementById('coach-nav').classList.add('logged-in');
+    goTo('teacher',document.getElementById('coach-nav'));
+    toast('Welcome, Coach Williams.');
+  }else{
+    document.getElementById('login-err').style.display='block';
+    document.getElementById('login-pass').value='';
+  }
+}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)closeModal(this.id);}));
+if(coachLoggedIn){
+  document.getElementById('coach-nav-label').textContent='Coach Portal';
+  document.getElementById('coach-badge').style.display='';
+  document.getElementById('coach-nav').classList.add('logged-in');
+}
+
+// ── DATA ──────────────────────────────────────────────────
+const AC=[['#EBF1FD','#0F2E8A'],['#FCEDEF','#8C141C'],['#DCFCE7','#166534'],['#FEF3C7','#92400E'],['#F3E8FF','#5B21B6'],['#FFF7ED','#9A3412']];
+let nextId=300;
+function ls(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
+function lss(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+
+let events=ls('wr3_events',[
+  {id:1,name:'vs Jesuit High School — Girls',type:'meet',date:'2026-01-15',time:'16:00',location:'Beaverton Aquatic Center'},
+  {id:2,name:'vs Jesuit High School — Boys',type:'meet',date:'2026-01-15',time:'16:00',location:'Beaverton Aquatic Center'},
+  {id:3,name:'Regional Qualifiers',type:'meet',date:'2026-07-05',time:'08:00',location:'Metro Swim Complex'},
+  {id:4,name:'100m Freestyle Trial',type:'trial',date:'2026-06-19',time:'15:30',location:'School Pool'},
+]);
+
+let times=ls('wr3_times',[
+  // Girls from Jesuit meet PDF
+  {id:1,name:'Jami Lee',gender:'girls',stroke:'Butterfly',dist:'100m',time:'64.16',date:'2026-01-15',pb:true},
+  {id:2,name:'Jami Lee',gender:'girls',stroke:'Breaststroke',dist:'100m',time:'72.37',date:'2026-01-15',pb:true},
+  {id:3,name:'Sophia Cho',gender:'girls',stroke:'Individual Medley',dist:'200m',time:'161.84',date:'2026-01-15',pb:true},
+  {id:4,name:'Helen Jeong',gender:'girls',stroke:'Freestyle',dist:'100m',time:'62.96',date:'2026-01-15',pb:true},
+  {id:5,name:'Naomi Lin',gender:'girls',stroke:'Freestyle',dist:'500m',time:'413.88',date:'2026-01-15',pb:true},
+  {id:6,name:'Naomi Lin',gender:'girls',stroke:'Breaststroke',dist:'100m',time:'72.95',date:'2026-01-15',pb:false},
+  {id:7,name:'Summer Richards',gender:'girls',stroke:'Freestyle',dist:'200m',time:'162.86',date:'2026-01-15',pb:true},
+  {id:8,name:'Kali Kaufman',gender:'girls',stroke:'Freestyle',dist:'500m',time:'473.79',date:'2026-01-15',pb:true},
+  {id:9,name:'Alice Leleko',gender:'girls',stroke:'Freestyle',dist:'100m',time:'65.80',date:'2026-01-15',pb:true},
+  {id:10,name:'Katie Mckenna',gender:'girls',stroke:'Butterfly',dist:'100m',time:'64.16',date:'2026-01-15',pb:true},
+  {id:11,name:'Sofia McQueen',gender:'girls',stroke:'Butterfly',dist:'100m',time:'77.44',date:'2026-01-15',pb:true},
+  {id:12,name:'Morgan Bean',gender:'girls',stroke:'Freestyle',dist:'100m',time:'65.84',date:'2026-01-15',pb:false},
+  // Boys from Jesuit meet PDF
+  {id:13,name:'Ethan Xu',gender:'boys',stroke:'Freestyle',dist:'50m',time:'25.49',date:'2026-01-15',pb:true},
+  {id:14,name:'Adhav Madabooshi Sainath',gender:'boys',stroke:'Individual Medley',dist:'200m',time:'132.78',date:'2026-01-15',pb:true},
+  {id:15,name:'Dharya Ray',gender:'boys',stroke:'Breaststroke',dist:'100m',time:'73.95',date:'2026-01-15',pb:true},
+  {id:16,name:'Emerson Cornelius',gender:'boys',stroke:'Butterfly',dist:'100m',time:'82.87',date:'2026-01-15',pb:true},
+  {id:17,name:'Brett Musgrave',gender:'boys',stroke:'Butterfly',dist:'100m',time:'66.46',date:'2026-01-15',pb:true},
+  {id:18,name:'Aaron Sutardjo',gender:'boys',stroke:'Butterfly',dist:'100m',time:'72.39',date:'2026-01-15',pb:false},
+  {id:19,name:'Ethan Xu',gender:'boys',stroke:'Freestyle',dist:'100m',time:'54.63',date:'2026-01-15',pb:true},
+  {id:20,name:'Atharva Raje',gender:'boys',stroke:'Freestyle',dist:'100m',time:'63.68',date:'2026-01-15',pb:true},
+  {id:21,name:'Aidan Chang',gender:'boys',stroke:'Freestyle',dist:'200m',time:'122.95',date:'2026-01-15',pb:true},
+  {id:22,name:'Talus Lin',gender:'boys',stroke:'Individual Medley',dist:'200m',time:'132.68',date:'2026-01-15',pb:true},
+  {id:23,name:'Henry Xie',gender:'boys',stroke:'Breaststroke',dist:'100m',time:'70.64',date:'2026-01-15',pb:true},
+  {id:24,name:'Aaron Sutardjo',gender:'boys',stroke:'Freestyle',dist:'500m',time:'569.02',date:'2026-01-15',pb:true},
+  {id:25,name:'Aidan Chang',gender:'boys',stroke:'Freestyle',dist:'500m',time:'516.34',date:'2026-01-15',pb:false},
+  {id:26,name:'Justin Miller',gender:'boys',stroke:'Freestyle',dist:'500m',time:'482.33',date:'2026-01-15',pb:true},
+]);
+
+let team=ls('wr3_team',[
+  // Girls
+  {id:1,name:'Jami Lee',gender:'girls',grade:'11th',spec:'Butterfly',status:'active',best:'1:04.16',note:''},
+  {id:2,name:'Sophia Cho',gender:'girls',grade:'10th',spec:'Individual Medley',status:'active',best:'2:41.84',note:''},
+  {id:3,name:'Helen Jeong',gender:'girls',grade:'12th',spec:'Freestyle',status:'active',best:'1:02.96',note:''},
+  {id:4,name:'Naomi Lin',gender:'girls',grade:'11th',spec:'Breaststroke',status:'active',best:'1:12.95',note:''},
+  {id:5,name:'Kali Kaufman',gender:'girls',grade:'10th',spec:'Freestyle',status:'active',best:'7:53.79',note:''},
+  {id:6,name:'Summer Richards',gender:'girls',grade:'9th',spec:'Freestyle',status:'active',best:'2:42.86',note:''},
+  {id:7,name:'Katie Mckenna',gender:'girls',grade:'11th',spec:'Butterfly',status:'active',best:'1:04.16',note:''},
+  {id:8,name:'Sofia McQueen',gender:'girls',grade:'10th',spec:'Butterfly',status:'active',best:'1:17.44',note:''},
+  {id:9,name:'Alice Leleko',gender:'girls',grade:'12th',spec:'Freestyle',status:'active',best:'1:05.80',note:''},
+  {id:10,name:'Morgan Bean',gender:'girls',grade:'11th',spec:'Freestyle',status:'active',best:'1:05.84',note:''},
+  // Boys
+  {id:11,name:'Ethan Xu',gender:'boys',grade:'11th',spec:'Freestyle',status:'active',best:'25.49s',note:''},
+  {id:12,name:'Adhav Madabooshi Sainath',gender:'boys',grade:'10th',spec:'Individual Medley',status:'active',best:'2:12.78',note:''},
+  {id:13,name:'Dharya Ray',gender:'boys',grade:'11th',spec:'Breaststroke',status:'active',best:'1:13.95',note:''},
+  {id:14,name:'Emerson Cornelius',gender:'boys',grade:'12th',spec:'Butterfly',status:'active',best:'1:22.87',note:''},
+  {id:15,name:'Brett Musgrave',gender:'boys',grade:'10th',spec:'Butterfly',status:'active',best:'1:06.46',note:''},
+  {id:16,name:'Aaron Sutardjo',gender:'boys',grade:'11th',spec:'Freestyle',status:'active',best:'9:29.02',note:''},
+  {id:17,name:'Aidan Chang',gender:'boys',grade:'9th',spec:'Freestyle',status:'active',best:'2:02.95',note:''},
+  {id:18,name:'Talus Lin',gender:'boys',grade:'10th',spec:'Individual Medley',status:'active',best:'2:12.68',note:''},
+  {id:19,name:'Henry Xie',gender:'boys',grade:'11th',spec:'Breaststroke',status:'active',best:'1:10.64',note:''},
+  {id:20,name:'Justin Miller',gender:'boys',grade:'12th',spec:'Freestyle',status:'active',best:'8:02.33',note:''},
+  {id:21,name:'Atharva Raje',gender:'boys',grade:'10th',spec:'Freestyle',status:'active',best:'1:03.68',note:''},
+]);
+
+let announcements=ls('wr3_ann',[
+  {id:1,title:'Welcome to the 2026 Season!',text:'We are excited to kick off the new season. Practice begins Monday at 7:00 AM at the school pool. Please bring your registration forms.',from:'Coach Williams',date:'Jan 10, 2026'},
+  {id:2,title:'Jesuit Meet Results — Great job!',text:'Westview Girls scored 81 points and Boys scored 50 points in our season opener vs Jesuit. Proud of everyone\'s effort. Full results are in the Times section.',from:'Coach Williams',date:'Jan 15, 2026'},
+]);
+
+let calEvents=ls('wr3_cal',[
+  {id:1,name:'Practice',type:'practice',date:'2026-06-16',time:'07:00',location:'School Pool',note:'Sprint focus'},
+  {id:2,name:'Practice',type:'practice',date:'2026-06-18',time:'07:00',location:'School Pool',note:'Endurance sets'},
+  {id:3,name:'Practice',type:'practice',date:'2026-06-20',time:'07:00',location:'School Pool',note:'Race prep'},
+  {id:4,name:'Lap-a-thon',type:'lapathon',date:'2026-06-21',time:'10:00',location:'School Pool',note:'Fundraiser event'},
+  {id:5,name:'Practice',type:'practice',date:'2026-06-23',time:'07:00',location:'School Pool',note:''},
+  {id:6,name:'Practice',type:'practice',date:'2026-06-25',time:'07:00',location:'School Pool',note:''},
+  {id:7,name:'vs Jefferson',type:'meet',date:'2026-06-27',time:'16:00',location:'Jefferson Pool',note:'Dual meet'},
+  {id:8,name:'Team Social',type:'social',date:'2026-06-28',time:'18:00',location:'Coach\'s house',note:'End of season BBQ'},
+]);
+
+function saveAll(){lss('wr3_events',events);lss('wr3_times',times);lss('wr3_team',team);lss('wr3_ann',announcements);lss('wr3_cal',calEvents);}
+
+// ── NAV ──────────────────────────────────────────────────
+const PAGE_META={
+  home:{title:'Dashboard',sub:"Welcome back — here's your team overview."},
+  announcements:{title:'Announcements',sub:'Team-wide news and coach messages.'},
+  events:{title:'Events',sub:'Meets, time trials, and competitions.'},
+  times:{title:'Times',sub:'Swimmer times separated by gender.'},
+  team:{title:'Roster',sub:'Girls and boys team roster.'},
+  analytics:{title:'Analytics',sub:'Performance charts and statistics.'},
+  calendar:{title:'Practice Calendar',sub:'Schedule practices, meets, and team events.'},
+  coach:{title:'AI Coach',sub:'Ask Coach Splash anything about swimming.'},
+  teacher:{title:'Coach Portal',sub:'Restricted — coaching staff only.'},
+};
+let timesGender='girls', teamGender='girls';
+
+function goTo(page,btn){
+  if(page==='teacher'&&!coachLoggedIn){coachNavClick();return;}
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item,.coach-link').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(btn)btn.classList.add('active');
+  const m=PAGE_META[page]||{};
+  document.getElementById('topbar-title').textContent=m.title||'';
+  document.getElementById('topbar-sub').textContent=m.sub||'';
+  const ar=document.getElementById('topbar-action');
+  if(page==='events'){ar.innerHTML='<button class="btn btn-primary btn-sm" onclick="document.getElementById(\'event-form-card\').style.display=\'\'"><i class="ti ti-plus"></i> Add event</button>';}
+  else if(page==='times'){ar.innerHTML='<button class="btn btn-primary btn-sm" onclick="document.getElementById(\'times-form-card\').style.display=\'\'"><i class="ti ti-plus"></i> Log time</button>';}
+  else{ar.innerHTML='<span class="date-badge" id="today-date"></span>';setDate();}
+  if(page==='home')renderHome();
+  if(page==='announcements')renderAnnouncements();
+  if(page==='events')renderEvents();
+  if(page==='times')renderTimes();
+  if(page==='team')renderTeam();
+  if(page==='analytics'){setTimeout(renderAnalytics,50);}
+  if(page==='calendar')renderCalendar();
+  if(page==='teacher')renderTeacher();
+}
+function navClick(page){
+  let found=null;
+  document.querySelectorAll('.nav-item').forEach(b=>{if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+page+"'"))found=b;});
+  goTo(page,found);
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function initials(n){return n.split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2);}
+function avatarColor(n){return AC[n.charCodeAt(0)%AC.length];}
+const BDGE={meet:'badge-blue',practice:'badge-green',trial:'badge-amber',lapathon:'badge-red',social:'badge-purple',other:'badge-grey'};
+const BLBL={meet:'Meet',practice:'Practice',trial:'Time Trial',lapathon:'Lap-a-thon',social:'Team Social',other:'Other'};
+const DOTC={meet:'meet',practice:'practice',trial:'trial'};
+function setDate(){const e=document.getElementById('today-date');if(e)e.textContent=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});}
+function toast(msg,err=false){
+  document.getElementById('toast-msg').textContent=msg;
+  document.getElementById('toast-icon').style.color=err?'#f87171':'#4ade80';
+  const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);
+}
+function fmtTime(s){
+  const sec=parseFloat(s);if(isNaN(sec))return s+'s';
+  if(sec<60)return sec.toFixed(2)+'s';
+  const m=Math.floor(sec/60);const r=(sec%60).toFixed(2).padStart(5,'0');return m+':'+r;
+}
+
+// ── ANNOUNCE BAR ─────────────────────────────────────────
+function updateAnnounceBar(){
+  if(!announcements.length){document.getElementById('announce-bar').classList.add('hidden');return;}
+  document.getElementById('announce-bar').classList.remove('hidden');
+  const latest=announcements[0];
+  document.getElementById('announce-bar-text').textContent='['+latest.date+'] '+latest.title+' — '+latest.text.slice(0,80)+(latest.text.length>80?'…':'');
+  document.getElementById('ann-notif').textContent=announcements.length;
+}
+
+// ── HOME ─────────────────────────────────────────────────
+function renderHome(){
+  document.getElementById('s-members').textContent=team.filter(s=>s.status==='active').length;
+  document.getElementById('s-events').textContent=events.length;
+  document.getElementById('s-times').textContent=times.length;
+  document.getElementById('s-pbs').textContent=times.filter(t=>t.pb).length;
+  const el=document.getElementById('home-events');
+  el.innerHTML=events.slice(0,4).map(e=>`<div class="event-row"><div class="event-dot ${DOTC[e.type]||'meet'}"></div><div class="event-info"><div class="event-name">${e.name}</div><div class="event-meta">${e.date}${e.time?' · '+e.time:''} · ${e.location||'TBD'}</div></div><span class="badge ${BDGE[e.type]||'badge-blue'}">${BLBL[e.type]||e.type}</span></div>`).join('')||'<div class="empty-state"><i class="ti ti-calendar-off"></i><p>No events yet.</p></div>';
+  document.getElementById('home-times').innerHTML=times.filter(t=>t.pb).slice(0,5).map(t=>`<tr><td style="font-weight:600">${t.name}</td><td>${t.dist} ${t.stroke}</td><td class="time-val">${fmtTime(t.time)}</td><td><span class="pb">PB</span></td></tr>`).join('')||'<tr><td colspan="4" style="padding:20px;text-align:center;color:var(--text-3);font-size:13px;">No personal bests yet.</td></tr>';
+  updateAnnounceBar();
+}
+
+// ── ANNOUNCEMENTS ────────────────────────────────────────
+function renderAnnouncements(){
+  const el=document.getElementById('ann-list');
+  if(!announcements.length){el.innerHTML='<div class="card"><div class="empty-state"><i class="ti ti-speakerphone"></i><p>No announcements yet.</p></div></div>';return;}
+  el.innerHTML=announcements.map(a=>`
+    <div class="card" style="margin-bottom:0">
+      <div class="card-header">
+        <div><div class="card-title">${a.title}</div><div style="font-size:11.5px;color:var(--text-3);margin-top:2px;">Posted by ${a.from} · ${a.date}</div></div>
+        ${coachLoggedIn?`<button class="btn btn-ghost btn-sm" onclick="deleteAnn(${a.id})" style="color:var(--red);border-color:transparent;"><i class="ti ti-trash" style="font-size:14px;"></i></button>`:''}
+      </div>
+      <div style="padding:16px 20px;font-size:13.5px;color:var(--text-2);line-height:1.7;">${a.text.replace(/\n/g,'<br>')}</div>
+    </div>
+  `).join('<div style="height:14px"></div>');
+}
+function deleteAnn(id){announcements=announcements.filter(a=>a.id!==id);saveAll();renderAnnouncements();updateAnnounceBar();toast('Announcement removed.');}
+function postAnnouncement(){
+  const title=document.getElementById('ann-title').value.trim();
+  const text=document.getElementById('ann-text').value.trim();
+  const from=document.getElementById('ann-from').value.trim();
+  if(!title||!text){toast('Please fill in title and message.',true);return;}
+  announcements.unshift({id:nextId++,title,text,from:from||'Coach',date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})});
+  saveAll();updateAnnounceBar();
+  document.getElementById('ann-title').value='';document.getElementById('ann-text').value='';
+  toast('Announcement posted.');
+}
+
+// ── EVENTS ───────────────────────────────────────────────
+function renderEvents(){
+  const f=document.getElementById('ev-filter')?.value||'';
+  const list=f?events.filter(e=>e.type===f):events;
+  document.getElementById('events-tbody').innerHTML=list.length?list.map(e=>`<tr><td style="font-weight:600">${e.name}</td><td><span class="badge ${BDGE[e.type]||'badge-blue'}">${BLBL[e.type]||e.type}</span></td><td>${e.date}</td><td style="color:var(--text-2)">${e.time||'—'}</td><td style="color:var(--text-2)">${e.location||'—'}</td><td><button class="btn btn-ghost btn-sm" onclick="deleteEvent(${e.id})" style="color:var(--red);border-color:transparent;padding:4px 8px;"><i class="ti ti-trash" style="font-size:13px;"></i></button></td></tr>`).join(''):'<tr><td colspan="6"><div class="empty-state"><i class="ti ti-calendar-off"></i><p>No events found.</p></div></td></tr>';
+}
+function addEvent(){
+  const name=document.getElementById('ev-name').value.trim(),date=document.getElementById('ev-date').value;
+  if(!name||!date){toast('Please fill in name and date.',true);return;}
+  events.unshift({id:nextId++,name,date,type:document.getElementById('ev-type').value,time:document.getElementById('ev-time').value,location:document.getElementById('ev-location').value.trim()});
+  saveAll();renderEvents();renderHome();
+  document.getElementById('event-form-card').style.display='none';
+  ['ev-name','ev-date','ev-time','ev-location'].forEach(id=>document.getElementById(id).value='');
+  toast('Event added.');
+}
+function deleteEvent(id){events=events.filter(e=>e.id!==id);saveAll();renderEvents();toast('Event removed.');}
+
+// ── TIMES ─────────────────────────────────────────────────
+function setTimesGender(g,btn){
+  timesGender=g;
+  document.querySelectorAll('#times-gender-tabs .gender-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderTimes();
+}
+function renderTimes(){
+  const f=document.getElementById('times-filter')?.value||'';
+  const list=times.filter(t=>t.gender===timesGender&&(!f||t.stroke===f));
+  document.getElementById('times-tbody').innerHTML=list.length?list.map(t=>`<tr><td style="font-weight:600">${t.name}</td><td>${t.stroke}</td><td>${t.dist}</td><td class="time-val">${fmtTime(t.time)}</td><td style="color:var(--text-2)">${t.date}</td><td>${t.pb?'<span class="pb">PB</span>':''}</td></tr>`).join(''):'<tr><td colspan="6"><div class="empty-state"><i class="ti ti-clock-off"></i><p>No times logged yet.</p></div></td></tr>';
+}
+function logTime(){
+  const name=document.getElementById('t-name').value.trim(),time=document.getElementById('t-time').value.trim();
+  if(!name||!time){toast('Please fill name and time.',true);return;}
+  const gender=document.getElementById('t-gender').value;
+  const stroke=document.getElementById('t-stroke').value,dist=document.getElementById('t-dist').value;
+  const prev=times.filter(t=>t.name===name&&t.stroke===stroke&&t.dist===dist);
+  const isPB=!prev.length||Math.min(...prev.map(t=>parseFloat(t.time)))>parseFloat(time);
+  times.unshift({id:nextId++,name,gender,stroke,dist,time,date:document.getElementById('t-date').value||new Date().toISOString().slice(0,10),pb:isPB});
+  saveAll();renderTimes();renderHome();
+  document.getElementById('times-form-card').style.display='none';
+  ['t-name','t-time','t-date'].forEach(id=>document.getElementById(id).value='');
+  toast(isPB?'New personal best!':'Time logged.');
+}
+
+// ── TEAM ──────────────────────────────────────────────────
+let _teamGender='girls';
+function setTeamGender(g,btn){
+  _teamGender=g;
+  document.querySelectorAll('#page-team .gender-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderTeam();
+}
+function renderTeam(){
+  const list=team.filter(s=>s.gender===_teamGender);
+  document.getElementById('team-tbody').innerHTML=list.length?list.map(s=>{const[bg,fg]=avatarColor(s.name);return`<tr><td><div class="swimmer-cell"><div class="avatar" style="background:${bg};color:${fg}">${initials(s.name)}</div><span style="font-weight:600">${s.name}</span></div></td><td style="color:var(--text-2)">${s.grade}</td><td>${s.spec}</td><td class="time-val">${s.best}</td><td><span class="badge ${s.status==='active'?'badge-green':'badge-amber'}">${s.status==='active'?'Active':'Reserve'}</span></td></tr>`;}).join(''):'<tr><td colspan="5"><div class="empty-state"><i class="ti ti-user-off"></i><p>No swimmers in this group yet.</p></div></td></tr>';
+  const counts={};team.forEach(s=>{counts[s.spec]=(counts[s.spec]||0)+1;});
+  const max=Math.max(...Object.values(counts),1);
+  document.getElementById('stroke-breakdown').innerHTML=Object.entries(counts).map(([spec,n])=>`<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;"><span style="font-weight:600">${spec}</span><span style="color:var(--text-3);font-size:11.5px;">${n}</span></div><div class="prog"><div class="prog-fill" style="width:${Math.round(n/max*100)}%;background:var(--blue)"></div></div></div>`).join('');
+  const sel=document.getElementById('note-swimmer');
+  if(sel)sel.innerHTML=team.map(s=>`<option value="${s.id}">${s.name} (${s.gender==='girls'?'G':'B'})</option>`).join('');
+}
+function addSwimmer(){
+  const name=document.getElementById('sw-name').value.trim();
+  if(!name){toast('Please enter a name.',true);return;}
+  const gender=document.getElementById('sw-gender').value;
+  team.push({id:nextId++,name,gender,grade:document.getElementById('sw-grade').value,spec:document.getElementById('sw-spec').value,status:'active',best:'—',note:''});
+  saveAll();renderTeam();document.getElementById('sw-name').value='';toast(name+' added.');
+}
+
+// ── ANALYTICS ────────────────────────────────────────────
+let chartInstances={};
+function destroyChart(id){if(chartInstances[id]){chartInstances[id].destroy();delete chartInstances[id];}}
+
+function renderAnalytics(){
+  const girls=team.filter(s=>s.gender==='girls').length;
+  const boys=team.filter(s=>s.gender==='boys').length;
+  const pbs=times.filter(t=>t.pb).length;
+  const gpbs=times.filter(t=>t.pb&&t.gender==='girls').length;
+  const bpbs=times.filter(t=>t.pb&&t.gender==='boys').length;
+  document.getElementById('an-stats').innerHTML=`
+    <div class="stat-card"><div class="stat-label">Girls swimmers</div><div class="stat-num red">${girls}</div><div class="stat-change">${times.filter(t=>t.gender==='girls').length} times logged</div></div>
+    <div class="stat-card"><div class="stat-label">Boys swimmers</div><div class="stat-num">${boys}</div><div class="stat-change">${times.filter(t=>t.gender==='boys').length} times logged</div></div>
+    <div class="stat-card"><div class="stat-label">Girls PBs</div><div class="stat-num red">${gpbs}</div><div class="stat-change up"><i class="ti ti-arrow-up"></i> Personal bests</div></div>
+    <div class="stat-card"><div class="stat-label">Boys PBs</div><div class="stat-num">${bpbs}</div><div class="stat-change up"><i class="ti ti-arrow-up"></i> Personal bests</div></div>
+  `;
+
+  // Chart 1: times by date
+  destroyChart('chart-times');
+  const dateCounts={};
+  times.forEach(t=>{const d=t.date||'Unknown';dateCounts[d]=(dateCounts[d]||0)+1;});
+  const dateLabels=Object.keys(dateCounts).sort();
+  chartInstances['chart-times']=new Chart(document.getElementById('chart-times'),{type:'bar',data:{labels:dateLabels,datasets:[{label:'Times logged',data:dateLabels.map(d=>dateCounts[d]),backgroundColor:'rgba(27,79,216,0.7)',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+
+  // Chart 2: stroke distribution
+  destroyChart('chart-strokes');
+  const strokeCounts={};times.forEach(t=>{strokeCounts[t.stroke]=(strokeCounts[t.stroke]||0)+1;});
+  const strokeColors=['rgba(27,79,216,0.8)','rgba(200,32,42,0.8)','rgba(22,101,52,0.8)','rgba(109,40,217,0.8)','rgba(146,64,14,0.8)'];
+  chartInstances['chart-strokes']=new Chart(document.getElementById('chart-strokes'),{type:'doughnut',data:{labels:Object.keys(strokeCounts),datasets:[{data:Object.values(strokeCounts),backgroundColor:strokeColors,borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:12}}}}});
+
+  // Chart 3: girls top times per stroke (average best)
+  destroyChart('chart-girls');
+  const girlsBest=buildBestChart('girls');
+  chartInstances['chart-girls']=new Chart(document.getElementById('chart-girls'),{type:'bar',data:{labels:girlsBest.labels,datasets:[{label:'Best time (s)',data:girlsBest.data,backgroundColor:'rgba(200,32,42,0.75)',borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}}});
+
+  // Chart 4: boys top times per stroke
+  destroyChart('chart-boys');
+  const boysBest=buildBestChart('boys');
+  chartInstances['chart-boys']=new Chart(document.getElementById('chart-boys'),{type:'bar',data:{labels:boysBest.labels,datasets:[{label:'Best time (s)',data:boysBest.data,backgroundColor:'rgba(27,79,216,0.75)',borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}}});
+
+  // Leaderboard
+  const pbSwimmers={};
+  times.filter(t=>t.pb).forEach(t=>{pbSwimmers[t.name]=(pbSwimmers[t.name]||0)+1;});
+  const sorted=Object.entries(pbSwimmers).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const maxPB=sorted[0]?.[1]||1;
+  document.getElementById('pb-leaderboard').innerHTML=sorted.map(([name,n],i)=>{
+    const[bg,fg]=avatarColor(name);
+    const g=team.find(s=>s.name===name)?.gender||'';
+    return`<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="width:22px;font-size:12px;font-weight:700;color:var(--text-3);text-align:center;">${i+1}</div>
+      <div class="avatar" style="background:${bg};color:${fg}">${initials(name)}</div>
+      <div style="flex:1"><div style="font-weight:600;font-size:13px;">${name}</div><div style="font-size:11.5px;color:var(--text-3);">${g==='girls'?'Girls':'Boys'}</div></div>
+      <div style="width:120px"><div class="prog"><div class="prog-fill" style="width:${Math.round(n/maxPB*100)}%;background:${g==='girls'?'var(--red)':'var(--blue)'}"></div></div></div>
+      <div style="font-weight:700;font-size:13px;color:var(--blue);width:24px;text-align:right;">${n}</div>
+    </div>`;
+  }).join('')||'<div class="empty-state"><i class="ti ti-trophy"></i><p>No personal bests recorded yet.</p></div>';
+}
+
+function buildBestChart(gender){
+  const strokes=['Freestyle','Backstroke','Breaststroke','Butterfly','Individual Medley'];
+  const labels=[],data=[];
+  strokes.forEach(stroke=>{
+    const filtered=times.filter(t=>t.gender===gender&&t.stroke===stroke);
+    if(filtered.length){
+      const best=Math.min(...filtered.map(t=>parseFloat(t.time)));
+      labels.push(stroke.replace('Individual Medley','IM'));
+      data.push(parseFloat(best.toFixed(2)));
+    }
+  });
+  return{labels,data};
+}
+
+// ── CALENDAR ─────────────────────────────────────────────
+let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
+function calMove(d){calMonth+=d;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+function renderCalendar(){
+  const now=new Date();
+  const label=new Date(calYear,calMonth,1).toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  document.getElementById('cal-month-label').textContent=label;
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const daysInPrev=new Date(calYear,calMonth,0).getDate();
+  let cells='';
+  // prev month padding
+  for(let i=firstDay-1;i>=0;i--){cells+=`<div class="cal-cell other-month"><div class="cal-date">${daysInPrev-i}</div></div>`;}
+  // current month
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=d===now.getDate()&&calMonth===now.getMonth()&&calYear===now.getFullYear();
+    const dayEvents=calEvents.filter(e=>e.date===dateStr);
+    const chips=dayEvents.map(e=>`<div class="cal-event-chip ${e.type}" title="${e.name}${e.note?' — '+e.note:''}" onclick="deleteCalEvent(${e.id})">${e.name}${e.note?' · '+e.note:''}</div>`).join('');
+    cells+=`<div class="cal-cell${isToday?' today':''}"><div class="cal-date">${d}</div>${chips}</div>`;
+  }
+  // next month padding
+  const used=firstDay+daysInMonth;const remaining=(7-used%7)%7;
+  for(let i=1;i<=remaining;i++){cells+=`<div class="cal-cell other-month"><div class="cal-date">${i}</div></div>`;}
+  document.getElementById('cal-body').innerHTML=cells;
+}
+function openCalModal(){
+  const today=new Date().toISOString().slice(0,10);
+  document.getElementById('cal-date').value=today;
+  openModal('cal-modal');
+}
+function addCalEvent(){
+  const name=document.getElementById('cal-name').value.trim();
+  const date=document.getElementById('cal-date').value;
+  if(!name||!date){toast('Please fill in name and date.',true);return;}
+  calEvents.push({id:nextId++,name,type:document.getElementById('cal-type').value,date,time:document.getElementById('cal-time').value,location:document.getElementById('cal-location').value,note:document.getElementById('cal-note').value});
+  saveAll();closeModal('cal-modal');renderCalendar();
+  ['cal-name','cal-date','cal-time','cal-location','cal-note'].forEach(id=>document.getElementById(id).value='');
+  toast('Event added to calendar.');
+}
+function deleteCalEvent(id){if(!confirm('Remove this event?'))return;calEvents=calEvents.filter(e=>e.id!==id);saveAll();renderCalendar();toast('Event removed.');}
+
+// ── TEACHER ───────────────────────────────────────────────
+function renderTeacher(){
+  document.getElementById('ts-swimmers').textContent=team.length;
+  document.getElementById('ts-events').textContent=events.length;
+  document.getElementById('ts-times').textContent=times.length;
+  document.getElementById('ts-pbs').textContent=times.filter(t=>t.pb).length;
+  document.getElementById('teacher-tbody').innerHTML=team.map(s=>{
+    const st=times.filter(t=>t.name===s.name);const[bg,fg]=avatarColor(s.name);const pct=Math.min(100,20+st.length*8);
+    return`<tr><td><div class="swimmer-cell"><div class="avatar" style="background:${bg};color:${fg}">${initials(s.name)}</div><span style="font-weight:600">${s.name}</span></div></td><td><span class="badge ${s.gender==='girls'?'badge-red':'badge-blue'}">${s.gender==='girls'?'Girls':'Boys'}</span></td><td>${s.spec}</td><td style="color:var(--text-2)">${st.length}</td><td class="time-val">${s.best}</td><td><div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${pct>70?'var(--blue)':'var(--amber)'}"></div></div></td><td style="font-size:12px;color:var(--text-3);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.note||'—'}</td></tr>`;
+  }).join('');
+  const sel=document.getElementById('note-swimmer');
+  if(sel)sel.innerHTML=team.map(s=>`<option value="${s.id}">${s.name} (${s.gender==='girls'?'G':'B'})</option>`).join('');
+}
+function saveNote(){
+  const sel=document.getElementById('note-swimmer'),note=document.getElementById('note-text').value.trim();
+  if(!note){toast('Please write a note.',true);return;}
+  const s=team.find(x=>x.id==sel.value);if(s){s.note=note;saveAll();renderTeacher();}
+  document.getElementById('note-text').value='';toast('Note saved for '+(s?.name||'swimmer')+'.');
+}
+
+// ── PDF IMPORT ─────────────────────────────────────────────
+function handleDrop(e){e.preventDefault();document.getElementById('upload-zone').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)handlePDFFile(f);else toast('Please drop a file.',true);}
+
+async function handlePDFFile(file){
+  if(!file)return;
+  const prog=document.getElementById('upload-progress');
+  const bar=document.getElementById('upload-bar');
+  const status=document.getElementById('upload-status');
+  prog.style.display='block';bar.style.width='5%';status.textContent='Reading file…';
+
+  try{
+    let base64='',mediaType='application/pdf';
+    // Convert file to base64
+    const ab=await file.arrayBuffer();
+    const bytes=new Uint8Array(ab);
+    let binary='';
+    for(let i=0;i<bytes.byteLength;i++)binary+=String.fromCharCode(bytes[i]);
+    base64=btoa(binary);
+    if(file.type.startsWith('image/'))mediaType=file.type;
+    bar.style.width='35%';status.textContent='Sending to AI…';
+
+    // Use Claude vision — send as base64 document
+    const msgContent=mediaType==='application/pdf'
+      ?[{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64}},{type:'text',text:'Extract all Westview High School swimmer results from this swim meet document. Return ONLY JSON, no markdown.\n\nJSON structure:\n{"meet_name":"string","date":"YYYY-MM-DD","location":"string","swimmers":[{"name":"string","gender":"girls|boys","stroke":"Freestyle|Backstroke|Breaststroke|Butterfly|Individual Medley","distance":"50m|100m|200m|400m|500m","time_seconds":58.34}]}\n\nRules: convert times like 1:02.34 to 62.34 seconds. Skip relay events. Only include individual events. School is Westview High School.'}]
+      :[{type:'image',source:{type:'base64',media_type:mediaType,data:base64}},{type:'text',text:'Extract all Westview High School swimmer results from this swim meet image. Return ONLY JSON, no markdown.\n\nJSON structure:\n{"meet_name":"string","date":"YYYY-MM-DD","location":"string","swimmers":[{"name":"string","gender":"girls|boys","stroke":"Freestyle|Backstroke|Breaststroke|Butterfly|Individual Medley","distance":"50m|100m|200m|400m|500m","time_seconds":58.34}]}\n\nRules: convert times like 1:02.34 to 62.34 seconds. Skip relay events. Only individual events.'}];
+
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4000,messages:[{role:'user',content:msgContent}]})
+    });
+    bar.style.width='70%';status.textContent='Processing results…';
+    const data=await res.json();
+    if(data.error){throw new Error(data.error.message);}
+    const raw=(data.content||[]).map(c=>c.text||'').join('');
+    let parsed;
+    try{
+      const clean=raw.replace(/```json|```/g,'').trim();
+      const start=clean.indexOf('{');const end=clean.lastIndexOf('}');
+      parsed=JSON.parse(clean.slice(start,end+1));
+    }catch(e){console.error('Parse error',raw);throw new Error('Could not parse AI response. Check console for details.');}
+
+    const meetDate=parsed.date||new Date().toISOString().slice(0,10);
+    const meetName=parsed.meet_name||file.name.replace('.pdf','');
+    let added=0,pbs=0;
+
+    if(!events.find(e=>e.name===meetName)){events.unshift({id:nextId++,name:meetName,type:'meet',date:meetDate,time:'',location:parsed.location||''});}
+
+    (parsed.swimmers||[]).forEach(s=>{
+      const dist=s.distance||'100m';
+      const stroke=s.stroke||'Freestyle';
+      const gender=s.gender||'girls';
+      const tSec=parseFloat(s.time_seconds)||0;
+      if(!tSec)return;
+      const timeStr=tSec.toFixed(2);
+      const prev=times.filter(t=>t.name===s.name&&t.stroke===stroke&&t.dist===dist);
+      const isPB=!prev.length||Math.min(...prev.map(t=>parseFloat(t.time)))>tSec;
+      times.unshift({id:nextId++,name:s.name,gender,stroke,dist,time:timeStr,date:meetDate,pb:isPB});
+      if(isPB)pbs++;added++;
+      if(!team.find(t=>t.name===s.name)){team.push({id:nextId++,name:s.name,gender,grade:'—',spec:stroke,status:'active',best:fmtTime(timeStr),note:''});}
+    });
+
+    saveAll();bar.style.width='100%';status.textContent=`Done — imported ${added} times (${pbs} personal bests).`;
+    renderHome();setTimeout(()=>{prog.style.display='none';bar.style.width='0%';},3500);
+    toast(`Imported ${added} times from ${meetName}`);
+  }catch(err){
+    prog.style.display='none';
+    console.error('PDF import error:',err);
+    toast('Import failed: '+err.message,true);
+  }
+}
+
+// ── AI CHAT ───────────────────────────────────────────────
+const chatHistory=[];
+const BOT_SYSTEM=`You are Coach Splash, an expert AI swim coach for Westview High School swim team. Give practical, concise, encouraging advice in 3-5 sentences unless a training plan is requested. Clear language for teen athletes. Topics: all four strokes, training plans, race strategy, nutrition, mental prep, turns, relay strategy, injury prevention.`;
+async function sendChat(){
+  const input=document.getElementById('chat-input');const msg=input.value.trim();if(!msg)return;
+  input.value='';appendMsg(msg,'user');chatHistory.push({role:'user',content:msg});
+  const typId=appendTyping();
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:BOT_SYSTEM,messages:chatHistory})});
+    const data=await res.json();removeTyping(typId);
+    const reply=data.content?.[0]?.text||'Sorry, trouble connecting.';
+    chatHistory.push({role:'assistant',content:reply});appendMsg(reply,'bot');
+  }catch(e){removeTyping(typId);appendMsg('Having trouble connecting. Check your internet and try again.','bot');}
+}
+function quickAsk(q){document.getElementById('chat-input').value=q;sendChat();}
+function appendMsg(text,who){const w=document.getElementById('chat-messages');const d=document.createElement('div');d.className='chat-msg '+who;d.innerHTML=`<div class="chat-label">${who==='bot'?'Coach Splash':'You'}</div><div class="chat-bubble">${text.replace(/\n/g,'<br>')}</div>`;w.appendChild(d);w.scrollTop=w.scrollHeight;}
+function appendTyping(){const w=document.getElementById('chat-messages');const id='typ'+Date.now();const d=document.createElement('div');d.className='chat-msg bot';d.id=id;d.innerHTML=`<div class="chat-label">Coach Splash</div><div class="chat-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;w.appendChild(d);w.scrollTop=w.scrollHeight;return id;}
+function removeTyping(id){document.getElementById(id)?.remove();}
+
+// ── INIT ──────────────────────────────────────────────────
+setDate();
+renderHome();
+updateAnnounceBar();
+</script>
+</body>
+</html>
